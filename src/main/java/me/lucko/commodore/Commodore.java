@@ -84,7 +84,9 @@ public interface Commodore {
      *
      * <p>Additionally applies the CraftBukkit {@link SuggestionProvider}
      * to all arguments within the node, so ASK_SERVER suggestions can continue
-     * to function for the command.</p>
+     * to function for the command. This will erase all {@link SuggestionProvider}
+     * already included in the node. To disable this behavior, call
+     * {@link #register(Command, LiteralCommandNode, Predicate, boolean)}.</p>
      *
      * <p>Players will only be sent argument data if they pass the provided
      * {@code permissionTest}.</p>
@@ -93,7 +95,28 @@ public interface Commodore {
      * @param node the argument data
      * @param permissionTest the predicate to check whether players should be sent argument data
      */
-    void register(Command command, LiteralCommandNode<?> node, Predicate<? super Player> permissionTest);
+    default void register(Command command, LiteralCommandNode<?> node, Predicate<? super Player> permissionTest) {
+        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(node, "node");
+        Objects.requireNonNull(permissionTest, "permissionTest");
+        register(command, node, permissionTest, true);
+    }
+
+    /**
+     * Registers the provided argument data to the dispatcher, against all
+     * aliases defined for the {@code command}.
+     *
+     * <p>Players will only be sent argument data if they pass the provided
+     * {@code permissionTest}.</p>
+     *
+     * @param command the command to read aliases from
+     * @param node the argument data
+     * @param permissionTest the predicate to check whether players should be sent argument data
+     * @param useBukkitTabCompleter if true, this method additionally applies the CraftBukkit {@link SuggestionProvider}
+     * to all arguments within the node, so ASK_SERVER suggestions can continue to function for the command.
+     * This will erase all {@link SuggestionProvider} already included in the node
+     */
+    void register(Command command, LiteralCommandNode<?> node, Predicate<? super Player> permissionTest, boolean useBukkitTabCompleter);
 
     /**
      * Registers the provided argument data to the dispatcher, against all
@@ -101,7 +124,9 @@ public interface Commodore {
      *
      * <p>Additionally applies the CraftBukkit {@link SuggestionProvider}
      * to all arguments within the node, so ASK_SERVER suggestions can continue
-     * to function for the command.</p>
+     * to function for the command. This will erase all {@link SuggestionProvider}
+     * already included in the node. To disable this behavior, call
+     * {@link #register(Command, LiteralArgumentBuilder, Predicate, boolean)}.</p>
      *
      * <p>Players will only be sent argument data if they pass the provided
      * {@code permissionTest}.</p>
@@ -120,15 +145,23 @@ public interface Commodore {
     /**
      * Registers the provided argument data to the dispatcher, against all
      * aliases defined for the {@code command}.
-     *
-     * <p>Additionally applies the CraftBukkit {@link SuggestionProvider}
-     * to all arguments within the node, so ASK_SERVER suggestions can continue
-     * to function for the command.</p>
+     * 
+     * <p>Players will only be sent argument data if they pass the provided
+     * {@code permissionTest}.</p>
      *
      * @param command the command to read aliases from
-     * @param node the argument data
+     * @param argumentBuilder the argument data, in a builder form
+     * @param permissionTest the predicate to check whether players should be sent argument data
+     * @param useBukkitTabCompleter if true, this method additionally applies the CraftBukkit {@link SuggestionProvider}
+     * to all arguments within the node, so ASK_SERVER suggestions can continue to function for the command.
+     * This will erase all {@link SuggestionProvider} already included in the node
      */
-    void register(Command command, LiteralCommandNode<?> node);
+    default void register(Command command, LiteralArgumentBuilder<?> argumentBuilder, Predicate<? super Player> permissionTest, boolean useBukkitTabCompleter) {
+        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(argumentBuilder, "argumentBuilder");
+        Objects.requireNonNull(permissionTest, "permissionTest");
+        register(command, argumentBuilder.build(), permissionTest, useBukkitTabCompleter);
+    }
 
     /**
      * Registers the provided argument data to the dispatcher, against all
@@ -136,7 +169,40 @@ public interface Commodore {
      *
      * <p>Additionally applies the CraftBukkit {@link SuggestionProvider}
      * to all arguments within the node, so ASK_SERVER suggestions can continue
-     * to function for the command.</p>
+     * to function for the command. This will erase all {@link SuggestionProvider}
+     * already included in the node. To disable this behavior, call
+     * {@link #register(Command, LiteralCommandNode, boolean)}.</p>
+     *
+     * @param command the command to read aliases from
+     * @param node the argument data
+     */
+    default void register(Command command, LiteralCommandNode<?> node) {
+        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(node, "node");
+        register(command, node, true);
+    }
+
+    /**
+     * Registers the provided argument data to the dispatcher, against all
+     * aliases defined for the {@code command}.
+     *
+     * @param command the command to read aliases from
+     * @param node the argument data
+     * @param useBukkitTabCompleter if true, this method additionally applies the CraftBukkit {@link SuggestionProvider}
+     * to all arguments within the node, so ASK_SERVER suggestions can continue to function for the command.
+     * This will erase all {@link SuggestionProvider} already included in the node
+     */
+    void register(Command command, LiteralCommandNode<?> node, boolean useBukkitTabCompleter);
+
+    /**
+     * Registers the provided argument data to the dispatcher, against all
+     * aliases defined for the {@code command}.
+     *
+     * <p>Additionally applies the CraftBukkit {@link SuggestionProvider}
+     * to all arguments within the node, so ASK_SERVER suggestions can continue
+     * to function for the command. This will erase all {@link SuggestionProvider}
+     * already included in the node. To disable this behavior, call
+     * {@link #register(Command, LiteralArgumentBuilder, boolean)}.</p>
      *
      * @param command the command to read aliases from
      * @param argumentBuilder the argument data, in a builder form
@@ -145,6 +211,22 @@ public interface Commodore {
         Objects.requireNonNull(command, "command");
         Objects.requireNonNull(argumentBuilder, "argumentBuilder");
         register(command, argumentBuilder.build());
+    }
+
+    /**
+     * Registers the provided argument data to the dispatcher, against all
+     * aliases defined for the {@code command}.
+     *
+     * @param command the command to read aliases from
+     * @param argumentBuilder the argument data, in a builder form
+     * @param useBukkitTabCompleter if true, this method additionally applies the CraftBukkit {@link SuggestionProvider}
+     * to all arguments within the node, so ASK_SERVER suggestions can continue to function for the command.
+     * This will erase all {@link SuggestionProvider} already included in the node
+     */
+    default void register(Command command, LiteralArgumentBuilder<?> argumentBuilder, boolean useBukkitTabCompleter) {
+        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(argumentBuilder, "argumentBuilder");
+        register(command, argumentBuilder.build(), useBukkitTabCompleter);
     }
 
     /**

@@ -171,14 +171,16 @@ final class CommodoreImpl implements Commodore {
     }
 
     @Override
-    public void register(Command command, LiteralCommandNode<?> node, Predicate<? super Player> permissionTest) {
+    public void register(Command command, LiteralCommandNode<?> node, Predicate<? super Player> permissionTest, boolean useBukkitTabCompleter) {
         Objects.requireNonNull(command, "command");
         Objects.requireNonNull(node, "node");
         Objects.requireNonNull(permissionTest, "permissionTest");
 
         try {
-            SuggestionProvider<?> wrapper = (SuggestionProvider<?>) COMMAND_WRAPPER_CONSTRUCTOR.newInstance(this.plugin.getServer(), command);
-            setCustomSuggestionProvider(node, wrapper);
+            if (useBukkitTabCompleter) {
+                SuggestionProvider<?> wrapper = (SuggestionProvider<?>) COMMAND_WRAPPER_CONSTRUCTOR.newInstance(this.plugin.getServer(), command);
+                setCustomSuggestionProvider(node, wrapper);
+            }
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -195,11 +197,11 @@ final class CommodoreImpl implements Commodore {
     }
 
     @Override
-    public void register(Command command, LiteralCommandNode<?> node) {
+    public void register(Command command, LiteralCommandNode<?> node, boolean useBukkitTabCompleter) {
         Objects.requireNonNull(command, "command");
         Objects.requireNonNull(node, "node");
 
-        register(command, node, command::testPermissionSilent);
+        register(command, node, command::testPermissionSilent, useBukkitTabCompleter);
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
