@@ -221,7 +221,7 @@ final class CommodoreImpl implements Commodore {
                 Object value = CUSTOM_SUGGESTIONS_FIELD.get(argumentNode);
                 if (value == Suggestions.dontAskServer()) {
                     CUSTOM_SUGGESTIONS_FIELD.set(argumentNode, null);
-                } else {
+                } else if (value == null) {
                     CUSTOM_SUGGESTIONS_FIELD.set(argumentNode, suggestionProvider);
                 }
             } catch (IllegalAccessException e) {
